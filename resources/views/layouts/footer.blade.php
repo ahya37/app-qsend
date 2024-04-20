@@ -1,5 +1,6 @@
 <div class="footer">
     <div class="copyright">
-          <p>Copyright © Designed &amp; Developed by <a href="http://dexignzone.com/" target="_blank">DexignZone</a> 2023</p>
+        <p class="fs-12"><strong>Qsend</strong> © {{date('Y')}} All Rights Reserved</p>
+        <p class="fs-12">Made with <span class="heart"></span> by Qsend</p>
     </div>
 </div>
