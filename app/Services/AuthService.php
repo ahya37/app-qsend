@@ -34,7 +34,7 @@ class AuthService
 				return redirect()->back()->with(['error' => 'Email / Password Salah']);
 			}
 		   
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
 			DB::rollback();
             return $e->getMessage();
         }

@@ -8,6 +8,9 @@ class DashboardController extends Controller
 {
     public function index()
     {
-        return view('welcome');
+        $data = [
+            'title' => 'Qr code'
+        ];
+        return view('whatsapp.qrcode-create', $data);
     }
 }

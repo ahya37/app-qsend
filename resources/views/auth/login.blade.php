@@ -28,7 +28,7 @@
                             <div class="col-xl-12">
                                 <div class="auth-form">
                                     <div class="text-center mb-3">
-                                        <img src="{{asset('assets/images/logo-full.png')}}" alt="">
+                                        <img src="{{asset('assets/images/qsend.png')}}" width="250px" alt="">
                                     </div>
                                     <h4 class="text-center mb-4">Sign in your account</h4>
                                     <form action="{{route('loginstore')}}" method="POST">

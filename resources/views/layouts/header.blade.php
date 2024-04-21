@@ -5,20 +5,20 @@
                 <div class="header-left">
                 </div>
                 <ul class="navbar-nav header-right">
-                    <li class="nav-item dropdown notification_dropdown">
+                    <li class="nav-item dropdown notification_dropdown ">
                           <a class="nav-link bell dz-theme-mode" href="javascript:void(0);">
-                            <i id="icon-light" class="fas fa-sun"></i>
-                             <i id="icon-dark" class="fas fa-moon"></i>
+                            <i id="icon-light" class="fas fa-sun cs-color"></i>
+                             <i id="icon-dark" class="fas fa-moon cs-color"></i>
                                     
                           </a>
                     </li>
                     
                     <li class="nav-item dropdown header-profile">
                         <a class="nav-link" href="#" role="button" data-bs-toggle="dropdown">
-                            <img src="{{asset('assets/images/profile/pic1.jpg')}}" width="20" alt="" class="rounded-circle">
+                            <img src="{{asset('assets/images/profile/user.png')}}" width="20" alt="" class="rounded-circle">
                             <div class="header-info">
-                                <span>Wiliam</span>
-                                <small>Super Admin</small>
+                                <span>{{auth()->guard('admin')->user()->name}}</span>
+                                {{-- <small>Super Admin</small> --}}
                             </div>
                             <i class="fa fa-caret-down ms-3 me-2 " aria-hidden="true"></i>
                         </a>
