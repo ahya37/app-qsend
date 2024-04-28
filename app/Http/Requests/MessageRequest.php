@@ -23,6 +23,7 @@ class MessageRequest extends FormRequest
     {
         return [
             'campaign' => 'required|string',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif',
             'contacts' => 'required|string',
             'message' => 'required|string',
         ];

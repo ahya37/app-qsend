@@ -36,7 +36,7 @@
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label>Media File</label>
-                                    <input class="form-control form-control-sm" name="file" id="formFileSm" type="file">
+                                    <input class="form-control form-control-sm" name="image" id="formFileSm" type="file">
                                 </div>
                                 <div class="form-group">
                                     <button type="submit" class="btn btn-sm  cs-bg-color cs-color-with"><i class="fa fa-paper-plane"></i> Kirim Pesan</button>

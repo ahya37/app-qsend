@@ -32,34 +32,45 @@ class WaController extends Controller
         DB::beginTransaction();
         try {
 
-            // return $request->all();
+            // Upload Image to application, return image name
+            $image = $request->file('image');
+            $fileName = time() . '_' . $image->getClientOriginalName();
+            $image->storeAs('public/whatsapp/images/', $fileName);
+            $filePath = storage_path('app/public/whatsapp/images/'.$fileName);
 
-            $request_contacts = $request->validated();
-            $request_contacts = $this->numberFormatter($request_contacts['contacts']);
+            //Up image to API Wa
+            $res_send_image =  WaService::uploadImage($filePath);
 
-            // $type_message     = 'media';
-            // WaService::saveCampaign($request, $request_contacts, $type_message);
-            
-            $response = [];
-            foreach ($request_contacts as $contact) {
-                $results =  WaService::sendMediaMessage($contact, $request->message, $request->file);
-                $results = json_decode($results, true);
-                $response[] = [$results];
+            if($res_send_image == 'success'){
+                $request_contacts = $request->validated();
+                $request_contacts = $this->numberFormatter($request_contacts['contacts']);
+    
+                $type_message     = 'media';
+                WaService::saveCampaign($request, $request_contacts, $type_message);
+                    
+                $response = [];
+                foreach ($request_contacts as $contact) {
+                    $results =  WaService::sendMediaMessage($contact, $request->message, $fileName);
+                    $results = json_decode($results, true);
+                    $response[] = [$results['message']];
+    
+                }
 
+                // save to table recipients
+                foreach ($response as  $value) {
+                        WaService::saveRecipients($request, $value[0], $fileName);
+                }
+                
+                DB::commit();
+                return redirect()->route('mediamesage.create')->with(['success' => 'Message sent successfuly']);
+            }else{
+                return redirect()->route('mediamesage.create')->with(['error' => 'Message failed to send']);
             }
-
-            // save to table recipients
-            // foreach ($response as  $value) {
-            //         WaService::saveRecipients($request, $value[0]);
-            // }
-            
-            DB::commit();
-            return $response;
-            return redirect()->route('message.create')->with(['success' => 'Pesan terkirim']);
 
         } catch (\Exception $e) {
             DB::rollBack();
-            return $e->getMessage();
+            // return $e->getMessage();
+            return redirect()->route('mediamesage.create')->with(['error' => 'Message failed to send']);
         }
 
     }
@@ -89,7 +100,7 @@ class WaController extends Controller
             }
             
             DB::commit();
-            return redirect()->route('message.create')->with(['success' => 'Pesan terkirim']);
+            return redirect()->route('message.create')->with(['success' => 'Message sent successfuly']);
 
         } catch (\Exception $e) {
             DB::rollBack();

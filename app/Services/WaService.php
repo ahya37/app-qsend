@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use App\Models\Recipient;
+use CURLFile;
 
 class WaService 
 {
@@ -63,11 +64,11 @@ class WaService
             "phone_no"  => $contact, 
             "key"       => $key,
             "message"   => $message,
-            "filename"  => $filename,
-            // "skip_link" => True, 
-            // "flag_retry"  => "on",
-            // "pendingTime" => 3,
-            // "deliveryFlag" => True,
+            "filename"  => '/media/'.$filename,
+            "skip_link" => True, 
+            "flag_retry"  => "on",
+            "pendingTime" => 3,
+            "deliveryFlag" => True,
             );
 
         $results   = $obj->getCurl($url, $data);
@@ -76,7 +77,38 @@ class WaService
 		
 	}
 
-    public static function saveRecipients($request, $data, $image = '', $document = '')
+    public static function uploadImage($filePath)
+	{
+        $obj = new self();
+        $key= $obj->key;
+        $url= $obj->url.'upload/'.$key;
+        $file_path = $filePath;
+        $cfile = new CURLFile($file_path,'text/plain',$file_path);
+
+        $data = array(
+            "file"  => $cfile,
+            );
+        
+            $ch = curl_init($url);
+            curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
+            curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_VERBOSE, 0);
+            curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 0);
+            curl_setopt($ch, CURLOPT_TIMEOUT, 360);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
+            curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+              'Content-Type: multipart/form-data',
+            ));
+            $results=curl_exec($ch);
+            curl_close($ch);
+
+        return $results;
+		
+	}
+
+    public static function saveRecipients($request, $data, $fileName = '', $document = '')
     {
         // save to table recipients
 
@@ -92,7 +124,7 @@ class WaService
         $recipients->account = '000';
         $recipients->number = '+'.$number;
         $recipients->messages = $request->message;
-        $recipients->image = $image;
+        $recipients->image = $fileName;
         $recipients->document = $document;
         $recipients->status = $data['status'];
         $recipients->created_at = $data['sentDate'];
@@ -139,5 +171,6 @@ class WaService
 
         return $res;
     }
+
 	
 }
