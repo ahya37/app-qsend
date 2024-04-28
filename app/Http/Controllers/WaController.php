@@ -58,11 +58,12 @@ class WaController extends Controller
 
                 // save to table recipients
                 foreach ($response as  $value) {
-                        WaService::saveRecipients($request, $value[0], $fileName);
+                        WaService::saveRecipients($request, $value[0], $filePath);
                 }
                 
                 DB::commit();
                 return redirect()->route('mediamesage.create')->with(['success' => 'Message sent successfuly']);
+
             }else{
                 return redirect()->route('mediamesage.create')->with(['error' => 'Message failed to send']);
             }
