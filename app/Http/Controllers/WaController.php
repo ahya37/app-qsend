@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\MessageRequest;
 use App\Services\WaService;
-use GuzzleHttp\Psr7\Request;
+use Illuminate\Support\Facades\DB;
 
 class WaController extends Controller
 {
@@ -12,22 +12,90 @@ class WaController extends Controller
     public function textMessage()
     {
         $data = [
-            'title' => 'Kirim Pesan'
+            'title' => 'Text Message'
         ];
 
         return view('whatsapp.textmessage', $data);
     }
 
-    public function textMessageStore(MessageRequest $request)
+    public function mediaMessage()
     {
-        $request_contacts = $request->validated();
-        $request_contacts = $this->numberFormatter($request_contacts['contacts']);
-        
-        foreach ($request_contacts as $contact) {
-            WaService::sendTextMessage($contact, $request->message);
+        $data = [
+            'title' => 'Media Message'
+        ];
+
+        return view('whatsapp.mediamessage', $data);
+    }
+
+    public function mediaMessageStore(MessageRequest $request)
+    {
+        DB::beginTransaction();
+        try {
+
+            // return $request->all();
+
+            $request_contacts = $request->validated();
+            $request_contacts = $this->numberFormatter($request_contacts['contacts']);
+
+            // $type_message     = 'media';
+            // WaService::saveCampaign($request, $request_contacts, $type_message);
+            
+            $response = [];
+            foreach ($request_contacts as $contact) {
+                $results =  WaService::sendMediaMessage($contact, $request->message, $request->file);
+                $results = json_decode($results, true);
+                $response[] = [$results];
+
+            }
+
+            // save to table recipients
+            // foreach ($response as  $value) {
+            //         WaService::saveRecipients($request, $value[0]);
+            // }
+            
+            DB::commit();
+            return $response;
+            return redirect()->route('message.create')->with(['success' => 'Pesan terkirim']);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return $e->getMessage();
         }
 
-        return redirect()->route('message.create')->with(['success' => 'Pesan terkirim']);
+    }
+
+    public function textMessageStore(MessageRequest $request)
+    {
+        DB::beginTransaction();
+        try {
+
+            $request_contacts = $request->validated();
+            $request_contacts = $this->numberFormatter($request_contacts['contacts']);
+
+            $type_message     = 'text';
+            WaService::saveCampaign($request, $request_contacts, $type_message);
+            
+            $response = [];
+            foreach ($request_contacts as $contact) {
+                $results =  WaService::sendTextMessage($contact, $request->message);
+                $results = json_decode($results, true);
+                $response[] = [$results['message']];
+
+            }
+
+            // save to table recipients
+            foreach ($response as  $value) {
+                    WaService::saveRecipients($request, $value[0]);
+            }
+            
+            DB::commit();
+            return redirect()->route('message.create')->with(['success' => 'Pesan terkirim']);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return $e->getMessage();
+        }
+
     }
 
     public function qrcode()

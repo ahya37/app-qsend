@@ -1,7 +1,12 @@
 <?php 
 
 namespace App\Services;
+
+use App\Models\Campaign;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
+use App\Models\Recipient;
 
 class WaService 
 {
@@ -13,62 +18,103 @@ class WaService
         $this->key = env('WOOWA_KEY');
         $this->url = env('WOOWA_URL');
     }
+
+    public static function saveCampaign($request, $contacts, $type_message)
+    {
+        return Campaign::create([
+            'id' => Str::random(30),
+            'name' => $request->campaign,
+            'type' => $type_message,
+            'status' => '', // temporary is empty value
+            'contacts' => count($contacts),
+            'created_by' => Auth::guard('admin')->user()->id
+        ]);
+    }
 	
 	public static function sendTextMessage($contact, $message)
 	{
-		DB::beginTransaction();
-        try {
+        $obj = new self();
+        $key= $obj->key;
+        $url= $obj->url.'send_message';
 
-            $obj = new self();
-            $key= $obj->key;
-            $url= $obj->url.'send_message';
+        $data = array(
+            "phone_no"  => $contact, 
+            "key"       => $key,
+            "message"   => $message,
+            "skip_link" => True, 
+            "flag_retry"  => "on",
+            "pendingTime" => 3,
+            "deliveryFlag" => True,
+            );
 
-            $data = array(
-                "phone_no"  => $contact, 
-                "key"       => $key,
-                "message"   => $message,
-                "skip_link" => True, 
-                "flag_retry"  => "on",
-                "pendingTime" => 3,
-                "deliveryFlag" => True,
-                );
+        $results   = $obj->getCurl($url, $data);
 
-            $res   = $obj->getCurl($url, $data);
-
-            // save response to table history message
-            DB::commit();
-
-            return $res;
-
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return $e->getMessage();
-        }
+        return $results;
 		
 	}
 
+    public static function sendMediaMessage($contact, $message, $filename)
+	{
+        $obj = new self();
+        $key= $obj->key;
+        $url= $obj->url.'send_image';
+
+        $data = array(
+            "phone_no"  => $contact, 
+            "key"       => $key,
+            "message"   => $message,
+            "filename"  => $filename,
+            // "skip_link" => True, 
+            // "flag_retry"  => "on",
+            // "pendingTime" => 3,
+            // "deliveryFlag" => True,
+            );
+
+        $results   = $obj->getCurl($url, $data);
+
+        return $results;
+		
+	}
+
+    public static function saveRecipients($request, $data, $image = '', $document = '')
+    {
+        // save to table recipients
+
+        // Handle if image or document is available
+
+
+        $x = explode("@", $data['messageId']);
+        $xs = explode("_",$x[0]);
+        $number = $xs[1];
+        
+        $recipients = new Recipient();
+        $recipients->id = $data['messageId'];
+        $recipients->account = '000';
+        $recipients->number = '+'.$number;
+        $recipients->messages = $request->message;
+        $recipients->image = $image;
+        $recipients->document = $document;
+        $recipients->status = $data['status'];
+        $recipients->created_at = $data['sentDate'];
+        $recipients->save();
+
+        return $recipients;
+    }
+
     public static function generateQrcode()
     {
-        DB::beginTransaction();
-        try {
+        $obj = new self();
+        $key= $obj->key;
+        $url= $obj->url.'generate_qr';
 
-            $obj = new self();
-            $key= $obj->key;
-            $url= $obj->url.'generate_qr';
+        $data = array(
+            "key"       => $key,
+            );
+    
+        $res   = $obj->getCurl($url, $data);
 
-            $data = array(
-                "key"       => $key,
-                );
-        
-            $res   = $obj->getCurl($url, $data);
-
-            DB::commit();
-            return $res;
-
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return $e->getMessage();
-        }
+        DB::commit();
+        return $res;
     }
 
     private function getCurl($url, $data)

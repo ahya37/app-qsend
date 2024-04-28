@@ -1,11 +1,8 @@
 <?php 
 
 namespace App\Services;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Hash;
 use App\Models\User;
-use App\TokenManagement;
 
 class AuthService 
 {
@@ -24,7 +21,12 @@ class AuthService
 			
 			#proses authentication
 			if (auth()->guard('admin')->attempt($auth)) {
-				
+
+				$userAuth = auth()->guard('admin')->user();
+				$token = $userAuth->createToken('app-percik')->plainTextToken;
+
+				// update token from token sanctum
+				$user->update(['remember_token' => $token]);
 				DB::commit();
 
 				return redirect()->intended(route('dashboard'));
@@ -44,6 +46,9 @@ class AuthService
 	public static function logout()
 	{
 		$auth = auth()->guard('admin');
+
+		// delete APi Token
+		$auth->user()->tokens()->delete(); 
 
         #logout
         $auth->logout();

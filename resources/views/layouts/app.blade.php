@@ -11,6 +11,9 @@
     <!-- Favicons Icon -->
     <link rel="icon" type="image/png" sizes="16x16" href="{{ asset('assets/icons/qsend.png') }}">
 
+     <!-- CSRF Token -->
+     <meta name="csrf-token" content="{{ csrf_token() }}">
+
     <!-- Page Title Here -->
     <title>Qsend | @yield('title')</title>
 

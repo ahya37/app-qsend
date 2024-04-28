@@ -12,13 +12,17 @@
                 <h4 class="card-title">Qr Code</h4>
             </div>
             <div class="card-body">
-                <form action="{{route('qrcode.generate')}}" method="POST">
-                    @csrf
+                <form action="{{route('qrcode.generate')}}" method="POST" id="qrcode-generate">
+                    @csrf 
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-group">
                                 <button type="submit" class="btn btn-sm  cs-bg-color cs-color-with"><i class="fa fa-qrcode"></i> Generate</button>
                             </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div id="Loading" class="d-none"></div>
+                            <img id="imgqrcode">
                         </div>
                     </div>
                 </form>
@@ -29,5 +33,5 @@
 @endsection
 
 @push('addon-scripts')
-     
+<script type="text/javascript" src="{{asset('js/qrcode-create.js')}}"></script>
 @endpush

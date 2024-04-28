@@ -12,7 +12,7 @@
             </div>
             <div class="card-body">
                 <div class="basic-form">
-                    <form action="{{route('message.store')}}" method="POST">
+                    <form action="{{route('mediamessage.store')}}" method="POST" enctype="multipart/form-data">
                         @csrf
                         <div class="row">
                             <div class="col-md-12">
@@ -26,14 +26,20 @@
                                     <label>Numbers</label>
                                     <textarea class="form-control" name="contacts" rows="8" id="myContacts"></textarea>
                                 </div>
-                                <div class="form-group">
-                                    <button type="submit" class="btn btn-sm  cs-bg-color cs-color-with"><i class="fa fa-paper-plane"></i> Kirim Pesan</button>
-                                </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label>Message</label>
-                                    <textarea class="form-control" name="message" rows="8" id="comment"></textarea>
+                                    <textarea class="form-control" name="message" rows="8" ></textarea>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>Media File</label>
+                                    <input class="form-control form-control-sm" name="file" id="formFileSm" type="file">
+                                </div>
+                                <div class="form-group">
+                                    <button type="submit" class="btn btn-sm  cs-bg-color cs-color-with"><i class="fa fa-paper-plane"></i> Kirim Pesan</button>
                                 </div>
                             </div>
                         </div>

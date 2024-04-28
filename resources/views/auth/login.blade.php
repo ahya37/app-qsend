@@ -15,6 +15,7 @@
 
     <link href="{{asset('assets/vendor/bootstrap-select/dist/css/bootstrap-select.min.css')}}" rel="stylesheet">
     <link href="{{asset('assets/css/style.css')}}" rel="stylesheet">
+    <link href="{{asset('assets/css/customcolor.css')}}" rel="stylesheet">
 
 </head>
 
@@ -43,7 +44,7 @@
                                         </div>
                                        
                                         <div class="text-center">
-                                            <button type="submit" class="btn btn-primary btn-block">Sign Me In</button>
+                                            <button type="submit" class="btn cs-bg-color cs-color-with btn-block">Sign Me In</button>
                                         </div>
                                     </form>
                                 </div>

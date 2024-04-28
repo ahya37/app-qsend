@@ -23,6 +23,9 @@ Route::middleware(['admin'])->group(function () {
 
         Route::get('/message/create', 'textMessage')->name('message.create');
         Route::post('/message/store', 'textMessageStore')->name('message.store');
+
+        Route::get('/message/media/create', 'mediaMessage')->name('mediamesage.create');
+        Route::post('/message/media/store', 'mediaMessageStore')->name('mediamessage.store');
    });
 
 });
